@@ -42,7 +42,7 @@ const useStyles = makeStyles({
 const App: React.FC = () => {
   const [rarity, setRarity] = useState(rarityButtons[0].value);
   const [attribute, setAttribute] = useState(attributeButtons[0].value);
-  const [cardImage, setCardImage] = useState("none");
+  const [cardImage, setCardImage] = useState("");
   const [imageSize, setImageSize] = useState(imageSizeButtons[0].value);
   const [name, setName] = useState("名前を入れてね");
   const [title, setTitle] = useState("肩書き");
@@ -58,33 +58,44 @@ const App: React.FC = () => {
   const fileSelected = () => {
     const files = fileElement.current && fileElement.current.files;
     if (files === null || files.length === 0) {
-      setCardImage("none");
+      setCardImage("");
     } else {
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
       reader.onload = () => {
-        setCardImage(`url(${reader.result})`);
+        setCardImage(reader.result as string);
       };
     }
   };
 
   const generate = () => {
-    html2canvas(previewElement.current as HTMLElement, {
-      width: cardSize.width,
-      height: cardSize.height
-    }).then(canvas => {
-      setCardData(canvas.toDataURL());
+    fetch("https://ik3kiulcre.execute-api.ap-northeast-1.amazonaws.com/Prod/make", {
+      method: "POST",
+      body: JSON.stringify({
+        imageSize: imageSize,
+        rarity: rarity,
+        attribute: attribute,
+        name: name,
+        title: title,
+        ability: ability,
+        abilityNote: abilityNote,
+        description: description,
+        qrText: qrText,
+        cardImage: cardImage
+      })
+    }).then(response => response.json()).then(json => {
+      setCardData(`data:image/png;base64,${json.image}`);
     });
   };
 
   const classes = useStyles();
 
   return <Container fixed>
-    <Grid container spacing={2}>
+    <Grid container spacing={3}>
       <Grid item>
-        <div ref={previewElement} style={{position: "relative", width: `${cardSize.width}px`, height: `${cardSize.height}px`}}>
-          <div className={classes.cardPart} style={{
-            backgroundImage: cardImage,
+        <div ref={previewElement} style={{position: "relative", width: `${cardSize.width}px`, height: `${cardSize.height}px`}} id="preview">
+          <div id="cardimage" className={classes.cardPart} style={{
+            backgroundImage: cardImage ? `url(${cardImage})` : "none",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundSize: imageSize,
@@ -161,7 +172,7 @@ const App: React.FC = () => {
             <div><input type="file" accept="image/*" ref={fileElement} onChange={fileSelected}/></div>
             <RadioGroup aria-label="imagesize" name="imagesize" value={imageSize} onChange={e => setImageSize(e.target.value)}>
             {
-              imageSizeButtons.map(data => <FormControlLabel key={`imagesize_${data.value}`} value={data.value} control={<Radio/>} label={data.label}/>)
+              imageSizeButtons.map(data => <FormControlLabel key={`imagesize_${data.value}`} value={data.value} control={<Radio/>} label={data.label} id={`imagesize_${data.value}`}/>)
             }
             </RadioGroup>
           </FormControl>
@@ -169,9 +180,9 @@ const App: React.FC = () => {
         <div>
           <FormControl component="fieldset">
             <FormLabel component="legend">レアリティ</FormLabel>
-            <RadioGroup aria-label="rarity" name="rarity" value={rarity} onChange={e => setRarity(e.target.value)}>
+            <RadioGroup row aria-label="rarity" name="rarity" value={rarity} onChange={e => setRarity(e.target.value)}>
             {
-              rarityButtons.map(data => <FormControlLabel key={`rarity_${data.value}`} value={data.value} control={<Radio/>} label={data.label}/>)
+              rarityButtons.map(data => <FormControlLabel key={`rarity_${data.value}`} value={data.value} control={<Radio/>} label={data.label} id={`rarity_${data.value}`}/>)
             }
             </RadioGroup>
           </FormControl>
@@ -179,25 +190,28 @@ const App: React.FC = () => {
         <div>
           <FormControl component="fieldset">
             <FormLabel component="legend">属性</FormLabel>
-            <RadioGroup aria-label="attribute" name="attribute" value={attribute} onChange={e => setAttribute(e.target.value)}>
+            <RadioGroup row aria-label="attribute" name="attribute" value={attribute} onChange={e => setAttribute(e.target.value)}>
             {
-              attributeButtons.map(data => <FormControlLabel key={`attribute${data.value}`} value={data.value} control={<Radio/>} label={data.label}/>)
+              attributeButtons.map(data => <FormControlLabel key={`attribute_${data.value}`} value={data.value} control={<Radio/>} label={data.label} id={`attribute_${data.value}`}/>)
             }
             </RadioGroup>
           </FormControl>
         </div>
         <div>
-          <div><TextField label="名前" value={name} onChange={e => setName(e.target.value)}/></div>
-          <div><TextField label="肩書き" value={title} onChange={e => setTitle(e.target.value)}/></div>
-          <div><TextField label="能力" value={ability} onChange={e => setAbility(e.target.value)}/></div>
-          <div><TextField label="能力の説明" value={abilityNote} onChange={e => setAbilityNote(e.target.value)}/></div>
-          <div><TextField multiline={true} label="説明" value={description} onChange={e => setDescription(e.target.value)}/></div>
-          <div><TextField label="QRコードを作りたい場合はテキスト入れてね" value={qrText} onChange={e => setQrText(e.target.value)}/></div>
+          <div><TextField label="名前" value={name} onChange={e => setName(e.target.value)} id="name"/></div>
+          <div><TextField label="肩書き" value={title} onChange={e => setTitle(e.target.value)} id="title"/></div>
+          <div><TextField label="能力" value={ability} onChange={e => setAbility(e.target.value)} id="ability"/></div>
+          <div><TextField label="能力の説明" value={abilityNote} onChange={e => setAbilityNote(e.target.value)} id="abilityNote"/></div>
+          <div><TextField multiline={true} label="説明" value={description} onChange={e => setDescription(e.target.value)} id="description"/></div>
+          <div><TextField label="QRコードを作りたい場合はテキスト入れてね" value={qrText} onChange={e => setQrText(e.target.value)} id="qrText"/></div>
         </div>
         <div>
-          <div><Button onClick={generate} variant="contained" color="primary">カード画像作成</Button></div>
-          {cardData && <div><img src={cardData}/></div>}
+          <div><Button onClick={generate} variant="contained" color="primary">画像に変換</Button></div>
         </div>
+      </Grid>
+      <Grid item style={{width: `${cardSize.width}px`, height: `${cardSize.height}px`}}>
+        <div>↓ここに変換された画像が出てくるので、保存してね。</div>
+        {cardData && <div><img src={cardData}/></div>}
       </Grid>
     </Grid>
   </Container>;
