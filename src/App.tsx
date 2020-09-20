@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
 import './App.css';
-import html2canvas from 'html2canvas';
 import { Button, Container, FormControl, FormControlLabel, FormLabel, Grid, makeStyles, Radio, RadioGroup, TextField } from '@material-ui/core';
 import QRCode from "qrcode.react";
+import { RouteComponentProps } from 'react-router-dom';
+import querystring from "querystring";
 
 const cardSize = {
   width: 744,
@@ -39,17 +40,44 @@ const useStyles = makeStyles({
   }
 });
 
-const App: React.FC = () => {
-  const [rarity, setRarity] = useState(rarityButtons[0].value);
-  const [attribute, setAttribute] = useState(attributeButtons[0].value);
+interface Props extends RouteComponentProps<{}> {}
+
+const takeFirst = (target: string | string[]): string | null => {
+  if (typeof target === "string") {
+    return target;
+  } else if (Array.isArray(target) && target.length > 0) {
+    return target[0];
+  } else {
+    return null;
+  }
+};
+
+const App = (props: Props) => {
+  const search = props.location.search;
+  const queryObject = querystring.parse(search.startsWith("?") ? search.substring(1) : search);
+
+  const queries = {
+    rarity: takeFirst(queryObject.rarity),
+    attribute: takeFirst(queryObject.attribute),
+    iamgeSize: takeFirst(queryObject.imageSize),
+    name: takeFirst(queryObject.name),
+    title: takeFirst(queryObject.title),
+    ability: takeFirst(queryObject.ability),
+    abilityNote: takeFirst(queryObject.abilityNote),
+    description: takeFirst(queryObject.description),
+    qrText: takeFirst(queryObject.qrText),
+  };
+
+  const [rarity, setRarity] = useState(queries.rarity && rarityButtons.some(b => b.value === queries.rarity) ? queries.rarity : rarityButtons[0].value);
+  const [attribute, setAttribute] = useState(queries.attribute && attributeButtons.some(b => b.value === queries.attribute) ? queries.attribute : attributeButtons[0].value);
   const [cardImage, setCardImage] = useState("");
-  const [imageSize, setImageSize] = useState(imageSizeButtons[0].value);
-  const [name, setName] = useState("名前を入れてね");
-  const [title, setTitle] = useState("肩書き");
-  const [ability, setAbility] = useState("能力名：なんかすごい能力");
-  const [abilityNote, setAbilityNote] = useState("能力の説明をここに入れるといいかもしれません。");
-  const [description, setDescription] = useState("ここに説明テキストを入れてね。");
-  const [qrText, setQrText] = useState("");
+  const [imageSize, setImageSize] = useState(queries.iamgeSize && imageSizeButtons.some(b => b.value === queries.iamgeSize) ? queries.iamgeSize : imageSizeButtons[0].value);
+  const [name, setName] = useState(queries.name || "名前を入れてね");
+  const [title, setTitle] = useState(queries.title || "肩書き");
+  const [ability, setAbility] = useState(queries.ability || "能力名：なんかすごい能力");
+  const [abilityNote, setAbilityNote] = useState(queries.abilityNote || "能力の説明をここに入れるといいかもしれません。");
+  const [description, setDescription] = useState(queries.description || "ここに説明テキストを入れてね。");
+  const [qrText, setQrText] = useState(queries.qrText || "");
   const [cardData, setCardData] = useState("");
 
   const fileElement = useRef<HTMLInputElement>(null);
