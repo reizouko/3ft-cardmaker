@@ -141,6 +141,7 @@ const App = (props: Props) => {
               top: "0",
               zIndex: 1
             }}
+            alt="カードのプレビュー。現在の設定で、カードはこのように見えます。"
           />
           <div id="name" className={classes.cardText} style={{
             left: "152px",
@@ -239,7 +240,7 @@ const App = (props: Props) => {
       </Grid>
       <Grid item style={{width: `${cardSize.width}px`, height: `${cardSize.height}px`}}>
         <div>↓ここに変換された画像が出てくるので、保存してね。</div>
-        {cardData && <div><img src={cardData}/></div>}
+        {cardData && <div><img src={cardData} alt="画像に変換したカードです。これを保存してください。"/></div>}
       </Grid>
     </Grid>
   </Container>;
