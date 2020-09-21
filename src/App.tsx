@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react';
 import './App.css';
-import { Button, Container, FormControl, FormControlLabel, FormLabel, Grid, makeStyles, Radio, RadioGroup, TextField } from '@material-ui/core';
+import { Button, Container, Dialog, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Grid, makeStyles, Radio, RadioGroup, TextField } from '@material-ui/core';
 import QRCode from "qrcode.react";
 import { RouteComponentProps } from 'react-router-dom';
 import querystring from "querystring";
+import html2canvas from "html2canvas";
 
 const cardSize = {
   width: 744,
@@ -83,6 +84,8 @@ const App = (props: Props) => {
   const fileElement = useRef<HTMLInputElement>(null);
   const previewElement = useRef<HTMLDivElement>(null);
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const fileSelected = () => {
     const files = fileElement.current && fileElement.current.files;
     if (files === null || files.length === 0) {
@@ -97,44 +100,39 @@ const App = (props: Props) => {
   };
 
   const generate = () => {
-    fetch("https://ik3kiulcre.execute-api.ap-northeast-1.amazonaws.com/Prod/make", {
-      method: "POST",
-      body: JSON.stringify({
-        imageSize: imageSize,
-        rarity: rarity,
-        attribute: attribute,
-        name: name,
-        title: title,
-        ability: ability,
-        abilityNote: abilityNote,
-        description: description,
-        qrText: qrText,
-        cardImage: cardImage
-      })
-    }).then(response => response.json()).then(json => {
-      setCardData(`data:image/png;base64,${json.image}`);
+    const rect = previewElement.current?.getBoundingClientRect();
+    html2canvas(previewElement.current as HTMLElement, {
+      allowTaint: true,
+      useCORS: true,
+      x: 24,
+      y: 90,
+      width: cardSize.width,
+      height: cardSize.height,
+      windowWidth: 1280,
+    }).then(canvas => {
+      setCardData(canvas.toDataURL());
+      setDialogOpen(true);
     });
   };
 
   const classes = useStyles();
 
-  return <Container fixed>
+  return <Container>
     <Grid container spacing={3}>
       <Grid item>
+        <h1>TFTカードジェネレーター</h1>
         <div ref={previewElement} style={{position: "relative", width: `${cardSize.width}px`, height: `${cardSize.height}px`}} id="preview">
           <div id="cardimage" className={classes.cardPart} style={{
             backgroundImage: cardImage ? `url(${cardImage})` : "none",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundSize: imageSize,
-            left: "0", top: "0",
-            width: `${cardSize.width}px`, height: `${cardSize.height}px`,
+            width: "100%", height: "100%",
             zIndex: 0
           }}></div>
           <img
             src={`${process.env.PUBLIC_URL}/cardfront/${rarity}_${attribute}.png`}
-            width={cardSize.width}
-            height={cardSize.height}
+            width="100%" height="100%"
             className={classes.cardPart}
             style={{
               left: "0", 
@@ -145,7 +143,7 @@ const App = (props: Props) => {
           />
           <div id="name" className={classes.cardText} style={{
             left: "152px",
-            top: "703px",
+            top: "693px",
             fontWeight: "bold",
             fontSize: "40px",
             letterSpacing: "3px",
@@ -153,7 +151,7 @@ const App = (props: Props) => {
           }}>{name}</div>
           <div id="title" className={classes.cardText} style={{
             right: "70px",
-            top: "723px",
+            top: "713px",
             fontWeight: 500,
             fontSize: "24px",
             fontStyle: "oblique",
@@ -162,7 +160,7 @@ const App = (props: Props) => {
           }}>{title}</div>
           <div id="ability" className={classes.cardText} style={{
             left: "50%",
-            top: "800px",
+            top: "795px",
             marginRight: "-50%",
             transform: "translate(-50%, -50%)",
             fontSize: "22px",
@@ -171,7 +169,7 @@ const App = (props: Props) => {
           }}>{ability}</div>
           <div id="abilityNote" className={classes.cardText} style={{
             left: "40px",
-            top: "825px",
+            top: "820px",
             maxWidth: "660px",
             fontSize: "14px",
             letterSpacing: "1px",
@@ -179,7 +177,7 @@ const App = (props: Props) => {
           }}>{abilityNote}</div>
           <div id="description" className={classes.cardText} style={{
             left: "40px",
-            top: "875px",
+            top: "870px",
             maxWidth: "660px",
             fontSize: "18px",
             letterSpacing: "1px",
@@ -238,11 +236,14 @@ const App = (props: Props) => {
           <div><Button onClick={generate} variant="contained" color="primary">画像に変換</Button></div>
         </div>
       </Grid>
-      <Grid item style={{width: `${cardSize.width}px`, height: `${cardSize.height}px`}}>
-        <div>↓ここに変換された画像が出てくるので、保存してね。</div>
-        {cardData && <div><img src={cardData} alt="画像に変換したカードです。これを保存してください。"/></div>}
-      </Grid>
     </Grid>
+    <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="md">
+      <DialogTitle>カード画像生成完了</DialogTitle>
+      <DialogContent>
+        <DialogContentText>この画像を保存してね。</DialogContentText>
+        {cardData && <div style={{textAlign: "center"}}><img src={cardData} alt="画像に変換したカードです。これを保存してください。"/></div>}
+      </DialogContent>
+    </Dialog>
   </Container>;
 };
 
