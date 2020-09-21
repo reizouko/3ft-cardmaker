@@ -100,7 +100,6 @@ const App = (props: Props) => {
   };
 
   const generate = () => {
-    const rect = previewElement.current?.getBoundingClientRect();
     html2canvas(previewElement.current as HTMLElement, {
       allowTaint: true,
       useCORS: true,
