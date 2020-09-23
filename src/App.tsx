@@ -86,6 +86,7 @@ const App = (props: Props) => {
     abilityNote: takeFirst(queryObject.abilityNote),
     description: takeFirst(queryObject.description),
     qrText: takeFirst(queryObject.qrText),
+    screenshot: takeFirst(queryObject.screenshot),
   };
 
   const [rarity, setRarity] = useState(queries.rarity && rarityButtons.some(b => b.value === queries.rarity) ? queries.rarity : rarityButtons[0].value);
@@ -101,7 +102,6 @@ const App = (props: Props) => {
   const [cardData, setCardData] = useState("");
 
   const fileElement = useRef<HTMLInputElement>(null);
-  const previewElement = useRef<HTMLDivElement>(null);
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -148,79 +148,158 @@ const App = (props: Props) => {
   return <Container>
     <Grid container spacing={3}>
       <Grid item>
-        <h1>TFTカードジェネレーター</h1>
-        <div ref={previewElement} style={{position: "relative", width: `${cardSize.width}px`, height: `${cardSize.height}px`}} id="preview">
-          <div id="cardimage" className={`${classes.cardPart} ${classes.cardFull}`} style={{
-            backgroundImage: cardImage ? `url(${cardImage})` : "none",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: imageSize,
-            zIndex: 0
-          }}></div>
-          <img
-            src={`${process.env.PUBLIC_URL}/cardfront/${rarity}_${attribute}.png`}
-            width="100%" height="100%"
-            className={`${classes.cardPart} ${classes.cardFull}`}
-            style={{
+        <h3>TFTカードジェネレーター</h3>
+        {
+          queries.screenshot === "true" ?
+          <div style={{position: "relative", width: `${cardSize.width}px`, height: `${cardSize.height}px`}} id="preview">
+            <div id="cardimage" className={`${classes.cardPart} ${classes.cardFull}`} style={{
+              backgroundImage: cardImage ? `url(${cardImage})` : "none",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundSize: imageSize,
               left: "0", 
               top: "0",
-              zIndex: 1
-            }}
-            alt="カードのプレビュー。現在の設定で、カードはこのように見えます。"
-          />
-          <div id="name" className={classes.cardText} style={{
-            left: "152px",
-            top: "703px",
-            maxWidth: "520px",
-            fontWeight: "bold",
-            fontSize: "40px",
-            letterSpacing: `${name.length > 10 ? 0 : name.length > 8 ? 2 : 3}px`,
-            zIndex: 2
-          }}>{name}</div>
-          <div id="title" className={classes.cardText} style={{
-            right: "70px",
-            top: "723px",
-            maxWidth: "520px",
-            fontWeight: 500,
-            fontSize: "24px",
-            fontStyle: "oblique",
-            letterSpacing: `${title.length > 8 ? 0 : title.length > 5 ? 2 : 3}px`,
-            zIndex: 3
-          }}>{title}</div>
-          <div id="ability" className={classes.cardText} style={{
-            left: "50%",
-            top: "800px",
-            marginRight: "-50%",
-            transform: "translate(-50%, -50%)",
-            maxWidth: "700px",
-            fontSize: "22px",
-            letterSpacing: `${ability.length > 30 ? 0 : ability.length > 20 ? 2 : 3}px`,
-            zIndex: 4
-          }}>{ability}</div>
-          <div id="abilityNote" className={classes.cardText} style={{
-            left: "40px",
-            top: "825px",
-            maxWidth: "660px",
-            fontSize: "14px",
-            letterSpacing: `${abilityNote.length > 42 ? 0 : 1}px`,
-            zIndex: 5
-          }}>{abilityNote}</div>
-          <div id="description" className={classes.cardText} style={{
-            left: "40px",
-            top: "875px",
-            maxWidth: "660px",
-            fontSize: "18px",
-            letterSpacing: "1px",
-            lineHeight: "32px",
-            whiteSpace: "pre-wrap",
-            zIndex: 6
-          }}>{description}</div>
-          { qrText.length > 0 && <QRCode value={qrText} size={62} className={classes.cardPart} style={{
-            left: "640px",
-            top: "47px",
-            zIndex: 7
-          }}/> }
-        </div>
+            zIndex: 0
+            }}></div>
+            <img
+              src={`${process.env.PUBLIC_URL}/cardfront/${rarity}_${attribute}.png`}
+              className={`${classes.cardPart} ${classes.cardFull}`}
+              style={{
+                left: "0", 
+                top: "0",
+                zIndex: 1
+              }}
+              alt="カードのプレビュー。現在の設定で、カードはこのように見えます。"
+            />
+            <div id="name" className={classes.cardText} style={{
+              left: "152px",
+              top: "703px",
+              maxWidth: "520px",
+              fontWeight: "bold",
+              fontSize: "40px",
+              letterSpacing: `${name.length > 10 ? 0 : name.length > 8 ? 2 : 3}px`,
+              zIndex: 2
+            }}>{name}</div>
+            <div id="title" className={classes.cardText} style={{
+              right: "70px",
+              top: "723px",
+              maxWidth: "520px",
+              fontWeight: 500,
+              fontSize: "24px",
+              fontStyle: "oblique",
+              letterSpacing: `${title.length > 8 ? 0 : title.length > 5 ? 2 : 3}px`,
+              zIndex: 3
+            }}>{title}</div>
+            <div id="ability" className={classes.cardText} style={{
+              left: "50%",
+              top: "800px",
+              marginRight: "-50%",
+              transform: "translate(-50%, -50%)",
+              maxWidth: "700px",
+              fontSize: "22px",
+              letterSpacing: `${ability.length > 30 ? 0 : ability.length > 20 ? 2 : 3}px`,
+              zIndex: 4
+            }}>{ability}</div>
+            <div id="abilityNote" className={classes.cardText} style={{
+              left: "40px",
+              top: "825px",
+              maxWidth: "660px",
+              fontSize: "14px",
+              letterSpacing: `${abilityNote.length > 42 ? 0 : 1}px`,
+              zIndex: 5
+            }}>{abilityNote}</div>
+            <div id="description" className={classes.cardText} style={{
+              left: "40px",
+              top: "875px",
+              maxWidth: "660px",
+              fontSize: "18px",
+              letterSpacing: "1px",
+              lineHeight: "32px",
+              whiteSpace: "pre-wrap",
+              zIndex: 6
+            }}>{description}</div>
+            { qrText.length > 0 && <QRCode value={qrText} size={62} className={classes.cardPart} style={{
+              left: "640px",
+              top: "47px",
+              zIndex: 7
+            }}/> }
+          </div> :
+          <div style={{position: "relative", width: "90vw", maxWidth: `${cardSize.width}px`, height: `${90 * cardSize.height / cardSize.width}vw`, maxHeight: `${cardSize.height}px`}}>
+            <div className={`${classes.cardPart} ${classes.cardFull}`} style={{
+              backgroundImage: cardImage ? `url(${cardImage})` : "none",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundSize: imageSize,
+              left: "0", 
+              top: "0",
+            zIndex: 0
+            }}></div>
+            <img
+              src={`${process.env.PUBLIC_URL}/cardfront/${rarity}_${attribute}.png`}
+              className={`${classes.cardPart} ${classes.cardFull}`}
+              style={{
+                left: "0", 
+                top: "0",
+                zIndex: 1
+              }}
+              alt="カードのプレビュー。現在の設定で、カードはこのように見えます。"
+            />
+            <div className={classes.cardText} style={{
+              left: `${152 * 100 / cardSize.width}%`,
+              top: `${703 * 100 / cardSize.height}%`,
+              maxWidth: `${520 * 100 / cardSize.width}%`,
+              fontWeight: "bold",
+              fontSize: `min(40px, ${90 * 40 / cardSize.width}vw)`,
+              letterSpacing: name.length > 10 ? "0px" : name.length > 8 ? `min(2px, ${90 * 2 / cardSize.width}vw)` : `min(3px, ${90 * 3 / cardSize.width}vw)`,
+              zIndex: 2
+            }}>{name}</div>
+            <div className={classes.cardText} style={{
+              right: `${70 * 100 / cardSize.width}%`,
+              top: `${723 * 100 / cardSize.height}%`,
+              maxWidth: `${520 * 100 / cardSize.width}%`,
+              fontWeight: 500,
+              fontSize: `min(24px, ${90 * 24 / cardSize.width}vw)`,
+              fontStyle: "oblique",
+              letterSpacing: title.length > 8 ? "0px" : title.length > 5 ? `min(2px, ${90 * 2 / cardSize.width}vw)` : `min(3px, ${90 * 3 / cardSize.width}vw)`,
+              zIndex: 3
+            }}>{title}</div>
+            <div className={classes.cardText} style={{
+              left: "50%",
+              top: `${800 * 100 / cardSize.height}%`,
+              marginRight: "-50%",
+              transform: "translate(-50%, -50%)",
+              maxWidth: `${700 * 100 / cardSize.width}%`,
+              fontSize: `min(22px, ${90 * 22 / cardSize.width}vw)`,
+              letterSpacing: ability.length > 30 ? "0px" : ability.length > 20 ? `min(2px, ${90 * 2 / cardSize.width}vw)` : `min(3px, ${90 * 3 / cardSize.width}vw)`,
+              zIndex: 4
+            }}>{ability}</div>
+            <div className={classes.cardText} style={{
+              left: `${40 * 100 / cardSize.width}%`,
+              top: `${825 * 100 / cardSize.height}%`,
+              maxWidth: `${660 * 100 / cardSize.width}%`,
+              fontSize: `min(14px, ${90 * 14 / cardSize.width}vw)`,
+              letterSpacing: abilityNote.length > 42 ? "0px" : `min(1px, ${90 * 1 / cardSize.width}vw)`,
+              zIndex: 5
+            }}>{abilityNote}</div>
+            <div className={classes.cardText} style={{
+              left: `${40 * 100 / cardSize.width}%`,
+              top: `${875 * 100 / cardSize.height}%`,
+              maxWidth: `${660 * 100 / cardSize.width}%`,
+              fontSize: `min(18px, ${90 * 18 / cardSize.width}vw)`,
+              letterSpacing: `min(1px, ${90 * 1 / cardSize.width}vw)`,
+              lineHeight: `min(32px, ${90 * 32 / cardSize.width}vw)`,
+              whiteSpace: "pre-wrap",
+              zIndex: 6
+            }}>{description}</div>
+            { qrText.length > 0 && <QRCode value={qrText} size={62} className={classes.cardPart} style={{
+              left: `${640 * 100 / cardSize.width}%`,
+              top: `${47 * 100 / cardSize.height}%`,
+              width: `min(62px, ${90 * 62 / cardSize.width}vw)`,
+              height: `min(62px, ${90 * 62 / cardSize.width}vw)`,
+              zIndex: 7
+            }}/> }
+          </div>
+        }
       </Grid>
       <Grid item className={classes.toolBox}>
         <div>
