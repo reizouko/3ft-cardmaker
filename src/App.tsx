@@ -171,7 +171,7 @@ const App = (props: Props) => {
             top: "703px",
             fontWeight: "bold",
             fontSize: "40px",
-            letterSpacing: "3px",
+            letterSpacing: `${name.length > 10 ? 0 : name.length > 8 ? 2 : 3}px`,
             zIndex: 2
           }}>{name}</div>
           <div id="title" className={classes.cardText} style={{
@@ -180,7 +180,7 @@ const App = (props: Props) => {
             fontWeight: 500,
             fontSize: "24px",
             fontStyle: "oblique",
-            letterSpacing: "3px",
+            letterSpacing: `${title.length > 8 ? 0 : title.length > 5 ? 2 : 3}px`,
             zIndex: 3
           }}>{title}</div>
           <div id="ability" className={classes.cardText} style={{
@@ -189,7 +189,7 @@ const App = (props: Props) => {
             marginRight: "-50%",
             transform: "translate(-50%, -50%)",
             fontSize: "22px",
-            letterSpacing: "3px",
+            letterSpacing: `${ability.length > 30 ? 0 : ability.length > 20 ? 2 : 3}px`,
             zIndex: 4
           }}>{ability}</div>
           <div id="abilityNote" className={classes.cardText} style={{
@@ -197,7 +197,7 @@ const App = (props: Props) => {
             top: "825px",
             maxWidth: "660px",
             fontSize: "14px",
-            letterSpacing: "1px",
+            letterSpacing: `${abilityNote.length > 42 ? 0 : 1}px`,
             zIndex: 5
           }}>{abilityNote}</div>
           <div id="description" className={classes.cardText} style={{
