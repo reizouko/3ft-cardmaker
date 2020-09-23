@@ -111,6 +111,9 @@ const App = (props: Props) => {
     }).then(canvas => {
       setCardData(canvas.toDataURL());
       setDialogOpen(true);
+    }).catch(err => {
+      console.log("html2canvasでエラー");
+      console.log(err);
     });
   };
 
