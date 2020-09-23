@@ -42,6 +42,8 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     fontFamily: "'Noto Sans JP',sans-serif",
     color: "#ffffff",
     textShadow: "2px 2px 1px #000000, -2px 2px 1px #000000, 2px -2px 1px #000000, -2px -2px 1px #000000, 2px 0px 1px #000000, 0px 2px 1px #000000, -2px 0px 1px #000000, 0px -2px 1px #000000",
+    overflowWrap: "break-word",
+    wordWrap: "break-word"
   },
   closeButton: {
     position: "absolute",
@@ -169,6 +171,7 @@ const App = (props: Props) => {
           <div id="name" className={classes.cardText} style={{
             left: "152px",
             top: "703px",
+            maxWidth: "520px",
             fontWeight: "bold",
             fontSize: "40px",
             letterSpacing: `${name.length > 10 ? 0 : name.length > 8 ? 2 : 3}px`,
@@ -177,6 +180,7 @@ const App = (props: Props) => {
           <div id="title" className={classes.cardText} style={{
             right: "70px",
             top: "723px",
+            maxWidth: "520px",
             fontWeight: 500,
             fontSize: "24px",
             fontStyle: "oblique",
@@ -188,6 +192,7 @@ const App = (props: Props) => {
             top: "800px",
             marginRight: "-50%",
             transform: "translate(-50%, -50%)",
+            maxWidth: "700px",
             fontSize: "22px",
             letterSpacing: `${ability.length > 30 ? 0 : ability.length > 20 ? 2 : 3}px`,
             zIndex: 4
