@@ -1,10 +1,10 @@
 import React, { useRef, useState } from 'react';
 import './App.css';
-import { Button, Container, Dialog, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Grid, makeStyles, Radio, RadioGroup, TextField } from '@material-ui/core';
+import { Button, Container, createStyles, Dialog, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Grid, IconButton, makeStyles, Radio, RadioGroup, TextField, Theme } from '@material-ui/core';
 import QRCode from "qrcode.react";
 import { RouteComponentProps } from 'react-router-dom';
 import querystring from "querystring";
-import html2canvas from "html2canvas";
+import CloseIcon from '@material-ui/icons/Close';
 
 const cardSize = {
   width: 744,
@@ -27,10 +27,14 @@ const imageSizeButtons = [
   {value: "contain", label: "カードに収まるように配置する"},
 ]
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme: Theme) => createStyles({
   cardPart: {
     position: "absolute",
     display: "inline-block",
+  },
+  cardFull: {
+    width: "100%",
+    height: "100%"
   },
   cardText: {
     position: "absolute",
@@ -38,8 +42,21 @@ const useStyles = makeStyles({
     fontFamily: "'Noto Sans JP',sans-serif",
     color: "#ffffff",
     textShadow: "2px 2px 1px #000000, -2px 2px 1px #000000, 2px -2px 1px #000000, -2px -2px 1px #000000, 2px 0px 1px #000000, 0px 2px 1px #000000, -2px 0px 1px #000000, 0px -2px 1px #000000",
+  },
+  closeButton: {
+    position: "absolute",
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500]
+  },
+  inputArea: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+  toolBox: {
+    marginTop: theme.spacing(3)
   }
-});
+}));
 
 interface Props extends RouteComponentProps<{}> {}
 
@@ -100,19 +117,26 @@ const App = (props: Props) => {
   };
 
   const generate = () => {
-    html2canvas(previewElement.current as HTMLElement, {
-      allowTaint: true,
-      useCORS: true,
-      x: 24,
-      y: 90,
-      width: cardSize.width,
-      height: cardSize.height,
-      windowWidth: 1280,
-    }).then(canvas => {
-      setCardData(canvas.toDataURL());
-      setDialogOpen(true);
+    setCardData("");
+    setDialogOpen(true);
+    fetch("https://ik3kiulcre.execute-api.ap-northeast-1.amazonaws.com/Prod/make", {
+      method: "POST",
+      body: JSON.stringify({
+        imageSize: imageSize,
+        rarity: rarity,
+        attribute: attribute,
+        name: name,
+        title: title,
+        ability: ability,
+        abilityNote: abilityNote,
+        description: description,
+        qrText: qrText,
+        cardImage: cardImage
+      })
+    }).then(response => response.json()).then(json => {
+      setCardData(`data:image/png;base64,${json.image}`);
     }).catch(err => {
-      console.log("html2canvasでエラー");
+      console.log("通信エラー");
       console.log(err);
     });
   };
@@ -124,18 +148,17 @@ const App = (props: Props) => {
       <Grid item>
         <h1>TFTカードジェネレーター</h1>
         <div ref={previewElement} style={{position: "relative", width: `${cardSize.width}px`, height: `${cardSize.height}px`}} id="preview">
-          <div id="cardimage" className={classes.cardPart} style={{
+          <div id="cardimage" className={`${classes.cardPart} ${classes.cardFull}`} style={{
             backgroundImage: cardImage ? `url(${cardImage})` : "none",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundSize: imageSize,
-            width: "100%", height: "100%",
             zIndex: 0
           }}></div>
           <img
             src={`${process.env.PUBLIC_URL}/cardfront/${rarity}_${attribute}.png`}
             width="100%" height="100%"
-            className={classes.cardPart}
+            className={`${classes.cardPart} ${classes.cardFull}`}
             style={{
               left: "0", 
               top: "0",
@@ -145,7 +168,7 @@ const App = (props: Props) => {
           />
           <div id="name" className={classes.cardText} style={{
             left: "152px",
-            top: "693px",
+            top: "703px",
             fontWeight: "bold",
             fontSize: "40px",
             letterSpacing: "3px",
@@ -153,7 +176,7 @@ const App = (props: Props) => {
           }}>{name}</div>
           <div id="title" className={classes.cardText} style={{
             right: "70px",
-            top: "713px",
+            top: "723px",
             fontWeight: 500,
             fontSize: "24px",
             fontStyle: "oblique",
@@ -162,7 +185,7 @@ const App = (props: Props) => {
           }}>{title}</div>
           <div id="ability" className={classes.cardText} style={{
             left: "50%",
-            top: "795px",
+            top: "800px",
             marginRight: "-50%",
             transform: "translate(-50%, -50%)",
             fontSize: "22px",
@@ -171,7 +194,7 @@ const App = (props: Props) => {
           }}>{ability}</div>
           <div id="abilityNote" className={classes.cardText} style={{
             left: "40px",
-            top: "820px",
+            top: "825px",
             maxWidth: "660px",
             fontSize: "14px",
             letterSpacing: "1px",
@@ -179,7 +202,7 @@ const App = (props: Props) => {
           }}>{abilityNote}</div>
           <div id="description" className={classes.cardText} style={{
             left: "40px",
-            top: "870px",
+            top: "875px",
             maxWidth: "660px",
             fontSize: "18px",
             letterSpacing: "1px",
@@ -194,7 +217,7 @@ const App = (props: Props) => {
           }}/> }
         </div>
       </Grid>
-      <Grid item>
+      <Grid item className={classes.toolBox}>
         <div>
           <FormControl component="fieldset">
             <FormLabel component="legend">画像</FormLabel>
@@ -227,23 +250,38 @@ const App = (props: Props) => {
           </FormControl>
         </div>
         <div>
-          <div><TextField label="名前" value={name} onChange={e => setName(e.target.value)} id="name"/></div>
-          <div><TextField label="肩書き" value={title} onChange={e => setTitle(e.target.value)} id="title"/></div>
-          <div><TextField label="能力" value={ability} onChange={e => setAbility(e.target.value)} id="ability"/></div>
-          <div><TextField label="能力の説明" value={abilityNote} onChange={e => setAbilityNote(e.target.value)} id="abilityNote"/></div>
-          <div><TextField multiline={true} label="説明" value={description} onChange={e => setDescription(e.target.value)} id="description"/></div>
-          <div><TextField label="QRコードを作りたい場合はテキスト入れてね" value={qrText} onChange={e => setQrText(e.target.value)} id="qrText"/></div>
+          <div className={classes.inputArea}><TextField label="名前" value={name} onChange={e => setName(e.target.value)} id="name" fullWidth/></div>
+          <div className={classes.inputArea}><TextField label="肩書き" value={title} onChange={e => setTitle(e.target.value)} id="title" fullWidth/></div>
+          <div className={classes.inputArea}><TextField label="能力" value={ability} onChange={e => setAbility(e.target.value)} id="ability" fullWidth/></div>
+          <div className={classes.inputArea}><TextField label="能力の説明" value={abilityNote} onChange={e => setAbilityNote(e.target.value)} id="abilityNote" fullWidth/></div>
+          <div className={classes.inputArea}><TextField multiline label="説明" value={description} onChange={e => setDescription(e.target.value)} id="description" fullWidth/></div>
+          <div className={classes.inputArea}><TextField multiline label="QRコード" helperText="QRコードにしたいテキスト(文字列)やURLがあれば入力してね" value={qrText} onChange={e => setQrText(e.target.value)} id="qrText" fullWidth/></div>
         </div>
         <div>
           <div><Button onClick={generate} variant="contained" color="primary">画像に変換</Button></div>
         </div>
       </Grid>
     </Grid>
-    <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="md">
-      <DialogTitle>カード画像生成完了</DialogTitle>
-      <DialogContent>
-        <DialogContentText>この画像を保存してね。</DialogContentText>
-        {cardData && <div style={{textAlign: "center"}}><img src={cardData} alt="画像に変換したカードです。これを保存してください。"/></div>}
+    <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} PaperProps={{
+      style: {
+        backgroundColor: "#efefef"
+      }
+    }}>
+      <DialogTitle>
+        カード画像
+        <IconButton aria-label="close" className={classes.closeButton} onClick={() => setDialogOpen(false)}>
+          <CloseIcon/>
+        </IconButton>
+      </DialogTitle>
+      <DialogContent dividers>
+        {
+          cardData ?
+            <>
+              <DialogContentText>この画像を保存してね。</DialogContentText>
+              <div style={{textAlign: "center"}}><img src={cardData} style={{maxWidth: "90%"}} alt="画像に変換したカードです。これを保存してください。"/></div>
+            </> :
+            <DialogContentText>ただいま画像作成中です。しばらくお待ちください…</DialogContentText>
+        }
       </DialogContent>
     </Dialog>
   </Container>;
