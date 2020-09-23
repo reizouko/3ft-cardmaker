@@ -224,7 +224,7 @@ const App = (props: Props) => {
               zIndex: 7
             }}/> }
           </div> :
-          <div style={{position: "relative", width: "90vw", maxWidth: `${cardSize.width}px`, height: `${90 * cardSize.height / cardSize.width}vw`, maxHeight: `${cardSize.height}px`}}>
+          <div style={{position: "relative", width: "90vw", maxWidth: `${cardSize.width}px`, height: `${90 * cardSize.height / cardSize.width}vw`, maxHeight: `${cardSize.height}px`}} id="preview">
             <div className={`${classes.cardPart} ${classes.cardFull}`} style={{
               backgroundImage: cardImage ? `url(${cardImage})` : "none",
               backgroundPosition: "center",
