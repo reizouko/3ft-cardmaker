@@ -60,7 +60,10 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   }
 }));
 
-interface Props extends RouteComponentProps<{}> {}
+const fitCardPart = (maxPixles: number) => `min(${maxPixles}px, ${90 * maxPixles / cardSize.width}vw)`;
+
+const createSet = (f: (value: React.SetStateAction<string>) => void) =>
+  (e: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => f(e.target.value);
 
 const takeFirst = (target: string | string[]): string | null => {
   if (typeof target === "string") {
@@ -71,6 +74,8 @@ const takeFirst = (target: string | string[]): string | null => {
     return null;
   }
 };
+    
+interface Props extends RouteComponentProps<{}> {}
 
 const App = (props: Props) => {
   const search = props.location.search;
@@ -104,6 +109,7 @@ const App = (props: Props) => {
   const fileElement = useRef<HTMLInputElement>(null);
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const closeDialog = () => setDialogOpen(false);
 
   const fileSelected = () => {
     const files = fileElement.current && fileElement.current.files;
@@ -224,7 +230,7 @@ const App = (props: Props) => {
               zIndex: 7
             }}/> }
           </div> :
-          <div style={{position: "relative", width: "90vw", maxWidth: `${cardSize.width}px`, height: `${90 * cardSize.height / cardSize.width}vw`, maxHeight: `${cardSize.height}px`}} id="preview">
+          <div style={{position: "relative", width: "90vw", maxWidth: `${cardSize.width}px`, height: fitCardPart(cardSize.height)}} id="preview">
             <div className={`${classes.cardPart} ${classes.cardFull}`} style={{
               backgroundImage: cardImage ? `url(${cardImage})` : "none",
               backgroundPosition: "center",
@@ -249,8 +255,8 @@ const App = (props: Props) => {
               top: `${703 * 100 / cardSize.height}%`,
               maxWidth: `${520 * 100 / cardSize.width}%`,
               fontWeight: "bold",
-              fontSize: `min(40px, ${90 * 40 / cardSize.width}vw)`,
-              letterSpacing: name.length > 10 ? "0px" : name.length > 8 ? `min(2px, ${90 * 2 / cardSize.width}vw)` : `min(3px, ${90 * 3 / cardSize.width}vw)`,
+              fontSize: fitCardPart(40),
+              letterSpacing: name.length > 10 ? "0px" : name.length > 8 ? fitCardPart(2) : fitCardPart(3),
               zIndex: 2
             }}>{name}</div>
             <div className={classes.cardText} style={{
@@ -258,9 +264,9 @@ const App = (props: Props) => {
               top: `${723 * 100 / cardSize.height}%`,
               maxWidth: `${520 * 100 / cardSize.width}%`,
               fontWeight: 500,
-              fontSize: `min(24px, ${90 * 24 / cardSize.width}vw)`,
+              fontSize: fitCardPart(24),
               fontStyle: "oblique",
-              letterSpacing: title.length > 8 ? "0px" : title.length > 5 ? `min(2px, ${90 * 2 / cardSize.width}vw)` : `min(3px, ${90 * 3 / cardSize.width}vw)`,
+              letterSpacing: title.length > 8 ? "0px" : title.length > 5 ? fitCardPart(2) : fitCardPart(3),
               zIndex: 3
             }}>{title}</div>
             <div className={classes.cardText} style={{
@@ -269,33 +275,33 @@ const App = (props: Props) => {
               marginRight: "-50%",
               transform: "translate(-50%, -50%)",
               maxWidth: `${700 * 100 / cardSize.width}%`,
-              fontSize: `min(22px, ${90 * 22 / cardSize.width}vw)`,
-              letterSpacing: ability.length > 30 ? "0px" : ability.length > 20 ? `min(2px, ${90 * 2 / cardSize.width}vw)` : `min(3px, ${90 * 3 / cardSize.width}vw)`,
+              fontSize: fitCardPart(22),
+              letterSpacing: ability.length > 30 ? "0px" : ability.length > 20 ? fitCardPart(2) : fitCardPart(3),
               zIndex: 4
             }}>{ability}</div>
             <div className={classes.cardText} style={{
               left: `${40 * 100 / cardSize.width}%`,
               top: `${825 * 100 / cardSize.height}%`,
               maxWidth: `${660 * 100 / cardSize.width}%`,
-              fontSize: `min(14px, ${90 * 14 / cardSize.width}vw)`,
-              letterSpacing: abilityNote.length > 42 ? "0px" : `min(1px, ${90 * 1 / cardSize.width}vw)`,
+              fontSize: fitCardPart(14),
+              letterSpacing: abilityNote.length > 42 ? "0px" : fitCardPart(1),
               zIndex: 5
             }}>{abilityNote}</div>
             <div className={classes.cardText} style={{
               left: `${40 * 100 / cardSize.width}%`,
               top: `${875 * 100 / cardSize.height}%`,
               maxWidth: `${660 * 100 / cardSize.width}%`,
-              fontSize: `min(18px, ${90 * 18 / cardSize.width}vw)`,
-              letterSpacing: `min(1px, ${90 * 1 / cardSize.width}vw)`,
-              lineHeight: `min(32px, ${90 * 32 / cardSize.width}vw)`,
+              fontSize: fitCardPart(18),
+              letterSpacing: fitCardPart(1),
+              lineHeight: fitCardPart(32),
               whiteSpace: "pre-wrap",
               zIndex: 6
             }}>{description}</div>
             { qrText.length > 0 && <QRCode value={qrText} size={62} className={classes.cardPart} style={{
               left: `${640 * 100 / cardSize.width}%`,
               top: `${47 * 100 / cardSize.height}%`,
-              width: `min(62px, ${90 * 62 / cardSize.width}vw)`,
-              height: `min(62px, ${90 * 62 / cardSize.width}vw)`,
+              width: fitCardPart(62),
+              height: fitCardPart(62),
               zIndex: 7
             }}/> }
           </div>
@@ -328,32 +334,34 @@ const App = (props: Props) => {
             <FormLabel component="legend">属性</FormLabel>
             <RadioGroup row aria-label="attribute" name="attribute" value={attribute} onChange={e => setAttribute(e.target.value)}>
             {
-              attributeButtons.map(data => <FormControlLabel key={`attribute_${data.value}`} value={data.value} control={<Radio/>} label={data.label} id={`attribute_${data.value}`}/>)
+              attributeButtons.map(data =>
+                <FormControlLabel key={`attribute_${data.value}`} value={data.value} control={<Radio/>} label={data.label} id={`attribute_${data.value}`}/>
+              )
             }
             </RadioGroup>
           </FormControl>
         </div>
         <div>
-          <div className={classes.inputArea}><TextField label="名前" value={name} onChange={e => setName(e.target.value)} id="name" fullWidth/></div>
-          <div className={classes.inputArea}><TextField label="肩書き" value={title} onChange={e => setTitle(e.target.value)} id="title" fullWidth/></div>
-          <div className={classes.inputArea}><TextField label="能力" value={ability} onChange={e => setAbility(e.target.value)} id="ability" fullWidth/></div>
-          <div className={classes.inputArea}><TextField label="能力の説明" value={abilityNote} onChange={e => setAbilityNote(e.target.value)} id="abilityNote" fullWidth/></div>
-          <div className={classes.inputArea}><TextField multiline label="説明" value={description} onChange={e => setDescription(e.target.value)} id="description" fullWidth/></div>
-          <div className={classes.inputArea}><TextField multiline label="QRコード" helperText="QRコードにしたいテキスト(文字列)やURLがあれば入力してね" value={qrText} onChange={e => setQrText(e.target.value)} id="qrText" fullWidth/></div>
+          <div className={classes.inputArea}><TextField label="名前" value={name} onChange={createSet(setName)} id="name" fullWidth/></div>
+          <div className={classes.inputArea}><TextField label="肩書き" value={title} onChange={createSet(setTitle)} id="title" fullWidth/></div>
+          <div className={classes.inputArea}><TextField label="能力" value={ability} onChange={createSet(setAbility)} id="ability" fullWidth/></div>
+          <div className={classes.inputArea}><TextField label="能力の説明" value={abilityNote} onChange={createSet(setAbilityNote)} id="abilityNote" fullWidth/></div>
+          <div className={classes.inputArea}><TextField multiline label="説明" value={description} onChange={createSet(setDescription)} id="description" fullWidth/></div>
+          <div className={classes.inputArea}><TextField multiline label="QRコード" helperText="QRコードにしたいテキスト(文字列)やURLがあれば入力してね" value={qrText} onChange={createSet(setQrText)} id="qrText" fullWidth/></div>
         </div>
         <div>
           <div><Button onClick={generate} variant="contained" color="primary">画像に変換</Button></div>
         </div>
       </Grid>
     </Grid>
-    <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} PaperProps={{
+    <Dialog open={dialogOpen} onClose={closeDialog} PaperProps={{
       style: {
         backgroundColor: "#efefef"
       }
     }}>
       <DialogTitle>
         カード画像
-        <IconButton aria-label="close" className={classes.closeButton} onClick={() => setDialogOpen(false)}>
+        <IconButton aria-label="close" className={classes.closeButton} onClick={closeDialog}>
           <CloseIcon/>
         </IconButton>
       </DialogTitle>
