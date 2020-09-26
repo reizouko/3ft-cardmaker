@@ -59,9 +59,6 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
-  toolBox: {
-    marginTop: theme.spacing(3)
-  }
 }));
 
 const fitCardPart = (maxPixles: number) => `min(${maxPixles}px, ${90 * maxPixles / cardSize.width}vw)`;
@@ -156,9 +153,9 @@ const App = (props: Props) => {
   const classes = useStyles();
 
   return <Container>
+    <h3>TFTカードジェネレーター</h3>
     <Grid container spacing={3}>
       <Grid item>
-        <h3>TFTカードジェネレーター</h3>
         {
           queries.screenshot === "true" ?
           <div style={{position: "relative", width: `${cardSize.width}px`, height: `${cardSize.height}px`}} id="preview">
@@ -169,7 +166,7 @@ const App = (props: Props) => {
               backgroundSize: imageSize,
               left: "0", 
               top: "0",
-            zIndex: 0
+              zIndex: 0
             }}></div>
             <img
               src={`${process.env.PUBLIC_URL}/cardfront/${rarity}_${attribute}.png`}
@@ -246,7 +243,7 @@ const App = (props: Props) => {
               backgroundSize: imageSize,
               left: "0", 
               top: "0",
-            zIndex: 0
+              zIndex: 0
             }}></div>
             <img
               src={`${process.env.PUBLIC_URL}/cardfront/${rarity}_${attribute}.png`}
@@ -319,7 +316,8 @@ const App = (props: Props) => {
           </div>
         }
       </Grid>
-      <Grid item className={classes.toolBox}>
+      <Grid item>
+        <p>納得のいく出来になったら「画像に変換」を押してください。</p>
         <div>
           <FormControl component="fieldset">
             <FormLabel component="legend">画像</FormLabel>
@@ -381,7 +379,7 @@ const App = (props: Props) => {
         {
           cardData ?
             <>
-              <DialogContentText>この画像を保存してね。</DialogContentText>
+              <DialogContentText>この画像を保存してね。(スマホの場合は画像長押し)</DialogContentText>
               <div style={{textAlign: "center"}}><img src={cardData} style={{maxWidth: "90%"}} alt="画像に変換したカードです。これを保存してください。"/></div>
             </> :
             <DialogContentText>ただいま画像作成中です。しばらくお待ちください…</DialogContentText>
