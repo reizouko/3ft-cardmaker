@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   cardPart: {
     position: "absolute",
     display: "inline-block",
+    margin: "0"
   },
   cardFull: {
     width: "100%",
@@ -44,6 +45,9 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     textShadow: "2px 2px 1px #000000, -2px 2px 1px #000000, 2px -2px 1px #000000, -2px -2px 1px #000000, 2px 0px 1px #000000, 0px 2px 1px #000000, -2px 0px 1px #000000, 0px -2px 1px #000000",
     overflowWrap: "break-word",
     wordWrap: "break-word"
+  },
+  thinShadow: {
+    textShadow: "1px 1px 1px #000000, -1px 1px 1px #000000, 1px -1px 1px #000000, -1px -1px 1px #000000, 1px 0px 1px #000000, 0px 1px 1px #000000, -1px 0px 1px #000000, 0px -1px 1px #000000"
   },
   closeButton: {
     position: "absolute",
@@ -206,7 +210,7 @@ const App = (props: Props) => {
               letterSpacing: `${ability.length > 30 ? 0 : ability.length > 20 ? 2 : 3}px`,
               zIndex: 4
             }}>{ability}</div>
-            <div id="abilityNote" className={classes.cardText} style={{
+            <div id="abilityNote" className={`${classes.cardText} ${classes.thinShadow}`} style={{
               left: "40px",
               top: "825px",
               maxWidth: "660px",
@@ -216,7 +220,7 @@ const App = (props: Props) => {
             }}>{abilityNote}</div>
             <div id="description" className={classes.cardText} style={{
               left: "40px",
-              top: "875px",
+              top: "874px",
               maxWidth: "660px",
               fontSize: "18px",
               letterSpacing: "1px",
@@ -224,11 +228,15 @@ const App = (props: Props) => {
               whiteSpace: "pre-wrap",
               zIndex: 6
             }}>{description}</div>
-            { qrText.length > 0 && <QRCode value={qrText} size={62} className={classes.cardPart} style={{
-              left: "640px",
-              top: "47px",
+            { qrText.length > 0 && <div className={classes.cardPart} style={{
+              left: "634px",
+              top: "41px",
+              padding: "2px",
+              backgroundColor: "#ffffff",
               zIndex: 7
-            }}/> }
+            }}><QRCode value={qrText} size={69} style={{
+              display: "block"
+            }}/></div> }
           </div> :
           <div style={{position: "relative", width: "90vw", maxWidth: `${cardSize.width}px`, height: fitCardPart(cardSize.height)}} id="preview">
             <div className={`${classes.cardPart} ${classes.cardFull}`} style={{
@@ -279,7 +287,7 @@ const App = (props: Props) => {
               letterSpacing: ability.length > 30 ? "0px" : ability.length > 20 ? fitCardPart(2) : fitCardPart(3),
               zIndex: 4
             }}>{ability}</div>
-            <div className={classes.cardText} style={{
+            <div className={`${classes.cardText} ${classes.thinShadow}`} style={{
               left: `${40 * 100 / cardSize.width}%`,
               top: `${825 * 100 / cardSize.height}%`,
               maxWidth: `${660 * 100 / cardSize.width}%`,
@@ -289,7 +297,7 @@ const App = (props: Props) => {
             }}>{abilityNote}</div>
             <div className={classes.cardText} style={{
               left: `${40 * 100 / cardSize.width}%`,
-              top: `${875 * 100 / cardSize.height}%`,
+              top: `${874 * 100 / cardSize.height}%`,
               maxWidth: `${660 * 100 / cardSize.width}%`,
               fontSize: fitCardPart(18),
               letterSpacing: fitCardPart(1),
@@ -297,13 +305,17 @@ const App = (props: Props) => {
               whiteSpace: "pre-wrap",
               zIndex: 6
             }}>{description}</div>
-            { qrText.length > 0 && <QRCode value={qrText} size={62} className={classes.cardPart} style={{
-              left: `${640 * 100 / cardSize.width}%`,
-              top: `${47 * 100 / cardSize.height}%`,
-              width: fitCardPart(62),
-              height: fitCardPart(62),
+            { qrText.length > 0 && <div className={classes.cardPart} style={{
+              left: `${634 * 100 / cardSize.width}%`,
+              top: `${41 * 100 / cardSize.height}%`,
+              padding: fitCardPart(2),
+              backgroundColor: "#ffffff",
               zIndex: 7
-            }}/> }
+            }}><QRCode value={qrText} size={69} style={{
+              display: "block",
+              width: fitCardPart(69),
+              height: fitCardPart(69),
+            }}/></div> }
           </div>
         }
       </Grid>
