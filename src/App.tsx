@@ -211,8 +211,8 @@ const App = (props: Props) => {
               left: "40px",
               top: "825px",
               maxWidth: "660px",
-              fontSize: "14px",
-              letterSpacing: `${abilityNote.length > 42 ? 0 : 1}px`,
+              fontSize: "15px",
+              letterSpacing: `${abilityNote.length > 40 ? 0 : 1}px`,
               zIndex: 5
             }}>{abilityNote}</div>
             <div id="description" className={classes.cardText} style={{
@@ -288,8 +288,8 @@ const App = (props: Props) => {
               left: `${40 * 100 / cardSize.width}%`,
               top: `${825 * 100 / cardSize.height}%`,
               maxWidth: `${660 * 100 / cardSize.width}%`,
-              fontSize: fitCardPart(14),
-              letterSpacing: abilityNote.length > 42 ? "0px" : fitCardPart(1),
+              fontSize: fitCardPart(15),
+              letterSpacing: abilityNote.length > 40 ? "0px" : fitCardPart(1),
               zIndex: 5
             }}>{abilityNote}</div>
             <div className={classes.cardText} style={{
