@@ -87,8 +87,11 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
       position={cardImagePosition}
       size={cardImageSize}
       lockAspectRatio
-      onDragStop={(e, d) => setCardImagePosition({x: d.x, y: d.y})}
-      onResizeStop={(e, direction, ref) => setCardImageSize({width: parseInt(ref.style.width), height: parseInt(ref.style.height)})} /> :
+      onDragStop={(_e, d) => setCardImagePosition({x: d.x, y: d.y})}
+      onResizeStop={(_e, _direction, ref, _delta, position) => {
+        setCardImageSize({width: parseInt(ref.style.width), height: parseInt(ref.style.height)});
+        setCardImagePosition(position);
+      }} /> :
       <div className={`${classes.cardPart} ${classes.cardFull}`} style={{
         backgroundImage: cardImage ? `url(${cardImage})` : "none",
         backgroundPosition: "center",
