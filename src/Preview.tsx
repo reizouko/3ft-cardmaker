@@ -202,6 +202,7 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
       width: fitCardPart(69),
       height: fitCardPart(69),
     }}/></div> }
+{/*    
     <Fab color="primary" className={classes.filterButton} style={{zIndex: 8}} onClick={event => setPopAnchorEl(event.currentTarget)}>
       <PhotoFilterIcon/>
     </Fab>
@@ -275,6 +276,7 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
         </Table>
       </div>
     </Popover>
+*/}
   </div>;
 });
 
