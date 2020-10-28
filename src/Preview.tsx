@@ -92,7 +92,7 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
   dragActive,
   filterValues}, cardFrameElement) => {
 
-  const [] = useState<HTMLElement | null>(null);
+  const [popAnchorEl, setPopAnchorEl] = useState<HTMLElement | null>(null);
 
   const classes = useStyles();
 
