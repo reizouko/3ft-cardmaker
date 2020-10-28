@@ -1,6 +1,5 @@
 import React, { forwardRef, useState } from 'react';
-import { Button, createStyles, Fab, makeStyles, Popover, Slider, Table, TableBody, TableCell, TableRow } from "@material-ui/core";
-import PhotoFilterIcon from '@material-ui/icons/PhotoFilter';
+import { createStyles, makeStyles } from "@material-ui/core";
 import { FC } from "react";
 import { Rnd } from 'react-rnd';
 import QRCode from "qrcode.react";
@@ -91,11 +90,9 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
   cardImageSize,
   setCardImageSize,
   dragActive,
-  filterValues,
-  setFilterValues
-}, cardFrameElement) => {
+  filterValues}, cardFrameElement) => {
 
-  const [popAnchorEl, setPopAnchorEl] = useState<HTMLElement | null>(null);
+  const [] = useState<HTMLElement | null>(null);
 
   const classes = useStyles();
 
