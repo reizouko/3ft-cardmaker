@@ -21,3 +21,15 @@ export const imageSizeButtons = [
   {value: "contain", label: "カードに収まるように配置する"},
   {value: "free", label: "位置と大きさを自由に動かす"}
 ];
+
+export interface FilterValues {
+  blur: number;
+  brightness: number;
+  contrast: number;
+  grayscale: number;
+  hueRotate: number;
+  invert: number;
+  opacity: number;
+  saturate: number;
+  sepia: number;
+}

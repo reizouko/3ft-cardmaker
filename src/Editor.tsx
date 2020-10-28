@@ -14,6 +14,13 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
+  accordion: {
+    backgroundColor: "#efefef",
+    marginBottom: theme.spacing(2)
+  },
+  filterResetButton: {
+    marginBottom: theme.spacing(2)
+  }
 }));
 
 const createSet = (f: (value: React.SetStateAction<string>) => void) =>

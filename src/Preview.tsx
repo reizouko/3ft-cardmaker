@@ -1,13 +1,26 @@
-import React, { forwardRef } from 'react';
-import { createStyles, makeStyles } from "@material-ui/core";
+import React, { forwardRef, useState } from 'react';
+import { Button, createStyles, Fab, makeStyles, Popover, Slider, Table, TableBody, TableCell, TableRow } from "@material-ui/core";
+import PhotoFilterIcon from '@material-ui/icons/PhotoFilter';
 import { FC } from "react";
 import { Rnd } from 'react-rnd';
 import QRCode from "qrcode.react";
-import { cardSize } from './common';
+import { cardSize, FilterValues } from './common';
 
 const fitCardPart = (maxPixles: number) => `min(${maxPixles}px, ${90 * maxPixles / cardSize.width}vw)`;
 
-const useStyles = makeStyles(() => createStyles({
+const filterToStyle = (filterValues: FilterValues) => `
+  blur(${filterValues.blur}px)
+  brightness(${filterValues.brightness}%)
+  contrast(${filterValues.contrast}%)
+  grayscale(${filterValues.grayscale}%)
+  hue-rotate(${filterValues.hueRotate}deg)
+  invert(${filterValues.invert}%)
+  opacity(${filterValues.opacity}%)
+  saturate(${filterValues.saturate}%)
+  sepia(${filterValues.sepia}%)
+`;
+
+const useStyles = makeStyles(theme => createStyles({
   cardPart: {
     position: "absolute",
     display: "inline-block",
@@ -29,6 +42,17 @@ const useStyles = makeStyles(() => createStyles({
   thinShadow: {
     textShadow: "1px 1px 1px #000000, -1px 1px 1px #000000, 1px -1px 1px #000000, -1px -1px 1px #000000, 1px 0px 1px #000000, 0px 1px 1px #000000, -1px 0px 1px #000000, 0px -1px 1px #000000"
   },
+  filterButton: {
+    position: "absolute",
+    left: "5px",
+    top: "5px"
+  },
+  filterArea: {
+    margin: theme.spacing(2)
+  },
+  slider: {
+    width: "100px"
+  }
 }));
 
 type PreviewProps = {
@@ -46,7 +70,9 @@ type PreviewProps = {
   setCardImagePosition: (position: {x: number, y: number}) => void,
   cardImageSize: {width: number, height: number},
   setCardImageSize: (size: {width: number, height: number}) => void,
-  dragActive: boolean
+  dragActive: boolean,
+  filterValues: FilterValues,
+  setFilterValues: (filterValues: FilterValues) => void
 };
 
 export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
@@ -64,8 +90,12 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
   setCardImagePosition,
   cardImageSize,
   setCardImageSize,
-  dragActive
+  dragActive,
+  filterValues,
+  setFilterValues
 }, cardFrameElement) => {
+
+  const [popAnchorEl, setPopAnchorEl] = useState<HTMLElement | null>(null);
 
   const classes = useStyles();
 
@@ -82,7 +112,8 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
         backgroundSize: "contain",
         border: dragActive ? "1px solid #000000": "none",
         boxSizing: "content-box",
-        zIndex: dragActive ? 10 : 0
+        zIndex: dragActive ? 10 : 0,
+        filter: filterToStyle(filterValues)
       }}
       position={cardImagePosition}
       size={cardImageSize}
@@ -99,7 +130,8 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
         backgroundSize: imageSize,
         left: "0", 
         top: "0",
-        zIndex: 0
+        zIndex: 0,
+        filter: filterToStyle(filterValues)
       }}/>
     }
     <img
@@ -170,6 +202,79 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
       width: fitCardPart(69),
       height: fitCardPart(69),
     }}/></div> }
+    <Fab color="primary" className={classes.filterButton} style={{zIndex: 8}} onClick={event => setPopAnchorEl(event.currentTarget)}>
+      <PhotoFilterIcon/>
+    </Fab>
+    <Popover
+      open={Boolean(popAnchorEl)}
+      anchorEl={popAnchorEl}
+      onClose={() => setPopAnchorEl(null)}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "left"
+      }}
+      PaperProps={{
+        style: {
+          backgroundColor: "rgba(255, 255, 255, 0.8)"
+        }
+      }}
+    >
+      <div className={classes.filterArea}>
+        <Button variant="contained" color="secondary" onClick={() => setFilterValues({
+          blur: 0,
+          brightness: 100,
+          contrast: 100,
+          grayscale: 0,
+          hueRotate: 0,
+          invert: 0,
+          opacity: 100,
+          saturate: 100,
+          sepia: 0
+        })}>
+          フィルタをリセット
+        </Button>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>コントラスト</TableCell>
+              <TableCell><Slider value={filterValues.contrast} min={0} max={200} className={classes.slider} onChange={(_event, newValue) => setFilterValues({...filterValues, contrast: newValue as number})}/></TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>明度</TableCell>
+              <TableCell><Slider value={filterValues.brightness} min={0} max={200} className={classes.slider} onChange={(_event, newValue) => setFilterValues({...filterValues, brightness: newValue as number})}/></TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>彩度</TableCell>
+              <TableCell><Slider value={filterValues.saturate} min={0} max={200} className={classes.slider} onChange={(_event, newValue) => setFilterValues({...filterValues, saturate: newValue as number})}/></TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>色相</TableCell>
+              <TableCell><Slider value={filterValues.hueRotate} min={0} max={359} className={classes.slider} onChange={(_event, newValue) => setFilterValues({...filterValues, hueRotate: newValue as number})}/></TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>階調</TableCell>
+              <TableCell><Slider value={filterValues.invert} min={0} max={100} className={classes.slider} onChange={(_event, newValue) => setFilterValues({...filterValues, invert: newValue as number})}/></TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>不透明度</TableCell>
+              <TableCell><Slider value={filterValues.opacity} min={0} max={100} className={classes.slider} onChange={(_event, newValue) => setFilterValues({...filterValues, opacity: newValue as number})}/></TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>セピア</TableCell>
+              <TableCell><Slider value={filterValues.sepia} min={0} max={100} className={classes.slider} onChange={(_event, newValue) => setFilterValues({...filterValues, sepia: newValue as number})}/></TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>グレー</TableCell>
+              <TableCell><Slider value={filterValues.grayscale} min={0} max={100} className={classes.slider} onChange={(_event, newValue) => setFilterValues({...filterValues, grayscale: newValue as number})}/></TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>ぼかし</TableCell>
+              <TableCell><Slider value={filterValues.blur} min={0} max={30} className={classes.slider} onChange={(_event, newValue) => setFilterValues({...filterValues, blur: newValue as number})}/></TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    </Popover>
   </div>;
 });
 
@@ -186,6 +291,7 @@ type ScreenshotProps = {
   qrText: string,
   cardImagePosition: {x: number, y: number},
   cardImageSize: {width: number, height: number},
+  filterValues: FilterValues
 };
   
 export const ScreenshotPreview: FC<ScreenshotProps> = ({
@@ -200,7 +306,8 @@ export const ScreenshotPreview: FC<ScreenshotProps> = ({
   description,
   qrText,
   cardImagePosition,
-  cardImageSize
+  cardImageSize,
+  filterValues
 }) => {
 
   const classes = useStyles();
@@ -223,7 +330,8 @@ export const ScreenshotPreview: FC<ScreenshotProps> = ({
         backgroundSize: imageSize,
         left: "0", 
         top: "0",
-        zIndex: 0
+        zIndex: 0,
+        filter: filterToStyle(filterValues)
       }}></div>
     }
     <img

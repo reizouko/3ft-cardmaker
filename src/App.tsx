@@ -4,7 +4,7 @@ import { Button, Container, createStyles, Dialog, DialogContent, DialogContentTe
 import { RouteComponentProps } from 'react-router-dom';
 import querystring from "querystring";
 import CloseIcon from '@material-ui/icons/Close';
-import { attributeButtons, cardSize, imageSizeButtons, rarityButtons } from './common';
+import { attributeButtons, cardSize, FilterValues, imageSizeButtons, rarityButtons } from './common';
 import Editor from './Editor';
 import { ResponsivePreview, ScreenshotPreview } from './Preview';
 
@@ -26,7 +26,17 @@ const takeFirst = (target: string | string[]): string | null => {
     return null;
   }
 };
-    
+
+const parseFilterValues = (filterValuesParameter: string | string[]): FilterValues | null => {
+  const filterValuesString = takeFirst(filterValuesParameter);
+  try {
+    return filterValuesString ? JSON.parse(filterValuesString) : null;
+  } catch (e) {
+    console.error(`Couldn't parse to create JSON: ${filterValuesString}`);
+    return null;
+  }
+};
+
 interface Props extends RouteComponentProps<{}> {}
 
 const App = (props: Props) => {
@@ -44,10 +54,11 @@ const App = (props: Props) => {
     description: takeFirst(queryObject.description),
     qrText: takeFirst(queryObject.qrText),
     screenshot: takeFirst(queryObject.screenshot),
-    imageX: parseFloat(takeFirst(queryObject.imageX) || "0"),
-    imageY: parseFloat(takeFirst(queryObject.imageY) || "0"),
-    imageWidth: parseFloat(takeFirst(queryObject.imageWidth) || "0"),
-    imageHeight: parseFloat(takeFirst(queryObject.imageHeight) || "0")
+    imageX: parseFloat(takeFirst(queryObject.imageX) ?? "0"),
+    imageY: parseFloat(takeFirst(queryObject.imageY) ?? "0"),
+    imageWidth: parseFloat(takeFirst(queryObject.imageWidth) ?? "0"),
+    imageHeight: parseFloat(takeFirst(queryObject.imageHeight) ?? "0"),
+    filter: parseFilterValues(queryObject.filter)
   };
 
   const [rarity, setRarity] = useState(queries.rarity && rarityButtons.some(b => b.value === queries.rarity) ? queries.rarity : rarityButtons[0].value);
@@ -62,6 +73,17 @@ const App = (props: Props) => {
   const [qrText, setQrText] = useState(queries.qrText || "");
   const [cardData, setCardData] = useState("");
   const [dragActive, setDragActive] = useState(queries.screenshot !== "true");
+  const [filterValues, setFilterValues] = useState<FilterValues>(queries.filter ?? {
+    blur: 0,
+    brightness: 100,
+    contrast: 100,
+    grayscale: 0,
+    hueRotate: 0,
+    invert: 0,
+    opacity: 100,
+    saturate: 100,
+    sepia: 0
+  });
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const closeDialog = () => setDialogOpen(false);
@@ -100,7 +122,8 @@ const App = (props: Props) => {
         imageX: cardImagePosition.x / cardFrameWidth * cardSize.width,
         imageY: cardImagePosition.y / cardFrameHeight * cardSize.height,
         imageWidth: cardImageSize.width / cardFrameWidth * cardSize.width,
-        imageHeight: cardImageSize.height / cardFrameHeight * cardSize.height
+        imageHeight: cardImageSize.height / cardFrameHeight * cardSize.height,
+        filter: JSON.stringify(filterValues)
       })
     }).then(response => response.json()).then(json => {
       setCardData(`data:image/png;base64,${json.image}`);
@@ -131,6 +154,7 @@ const App = (props: Props) => {
                 qrText={qrText}
                 cardImagePosition={cardImagePosition}
                 cardImageSize={cardImageSize}
+                filterValues={filterValues}
               /> :
               <ResponsivePreview
                 imageSize={imageSize}
@@ -148,6 +172,8 @@ const App = (props: Props) => {
                 cardImageSize={cardImageSize}
                 setCardImageSize={setCardImageSize}
                 dragActive={dragActive}
+                filterValues={filterValues}
+                setFilterValues={setFilterValues}
                 ref={cardFrameElement}
               />
           }
