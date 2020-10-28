@@ -61,6 +61,8 @@ const App = (props: Props) => {
     filter: parseFilterValues(queryObject.filter)
   };
 
+  console.log(queryObject.filter)
+
   const [rarity, setRarity] = useState(queries.rarity && rarityButtons.some(b => b.value === queries.rarity) ? queries.rarity : rarityButtons[0].value);
   const [attribute, setAttribute] = useState(queries.attribute && attributeButtons.some(b => b.value === queries.attribute) ? queries.attribute : attributeButtons[0].value);
   const [cardImage, setCardImage] = useState("");
@@ -123,7 +125,7 @@ const App = (props: Props) => {
         imageY: cardImagePosition.y / cardFrameHeight * cardSize.height,
         imageWidth: cardImageSize.width / cardFrameWidth * cardSize.width,
         imageHeight: cardImageSize.height / cardFrameHeight * cardSize.height,
-        filter: JSON.stringify(filterValues)
+        filter: filterValues
       })
     }).then(response => response.json()).then(json => {
       setCardData(`data:image/png;base64,${json.image}`);
