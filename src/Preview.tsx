@@ -1,5 +1,6 @@
 import React, { forwardRef, useState } from 'react';
-import { createStyles, makeStyles } from "@material-ui/core";
+import { Button, createStyles, Fab, makeStyles, Popover, Slider, Table, TableBody, TableCell, TableRow } from "@material-ui/core";
+import PhotoFilterIcon from "@material-ui/icons/PhotoFilter"
 import { FC } from "react";
 import { Rnd } from 'react-rnd';
 import QRCode from "qrcode.react";
@@ -90,9 +91,11 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
   cardImageSize,
   setCardImageSize,
   dragActive,
-  filterValues}, cardFrameElement) => {
+  filterValues,
+  setFilterValues
+}, cardFrameElement) => {
 
-  //const [popAnchorEl, setPopAnchorEl] = useState<HTMLElement | null>(null);
+  const [popAnchorEl, setPopAnchorEl] = useState<HTMLElement|null>(null);
   useState<HTMLElement | null>(null);
 
   const classes = useStyles();
@@ -200,7 +203,6 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
       width: fitCardPart(69),
       height: fitCardPart(69),
     }}/></div> }
-{/*    
     <Fab color="primary" className={classes.filterButton} style={{zIndex: 8}} onClick={event => setPopAnchorEl(event.currentTarget)}>
       <PhotoFilterIcon/>
     </Fab>
@@ -274,7 +276,6 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
         </Table>
       </div>
     </Popover>
-*/}
   </div>;
 });
 
@@ -321,7 +322,8 @@ export const ScreenshotPreview: FC<ScreenshotProps> = ({
         top: cardImagePosition.y,
         width: cardImageSize.width,
         height: cardImageSize.height,
-        zIndex: 0
+        zIndex: 0,
+        filter: filterToStyle(filterValues)
       }}></div> :
       <div id="cardimage" className={`${classes.cardPart} ${classes.cardFull}`} style={{
         backgroundImage: cardImage ? `url(${cardImage})` : "none",
