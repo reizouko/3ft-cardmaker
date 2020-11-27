@@ -175,8 +175,10 @@ export const ResponsivePreview = forwardRef<HTMLDivElement, PreviewProps>(({
       zIndex: 4
     }}>{ability}</div>
     <div className={`${classes.cardText} ${classes.thinShadow}`} style={{
-      left: `${40 * 100 / cardSize.width}%`,
+      left: "50%",
       top: `${825 * 100 / cardSize.height}%`,
+      marginRight: "-50%",
+      transform: "translate(-50%)",
       maxWidth: `${660 * 100 / cardSize.width}%`,
       fontSize: fitCardPart(15),
       letterSpacing: abilityNote.length > 40 ? "0px" : fitCardPart(1),
@@ -376,8 +378,10 @@ export const ScreenshotPreview: FC<ScreenshotProps> = ({
       zIndex: 4
     }}>{ability}</div>
     <div id="abilityNote" className={`${classes.cardText} ${classes.thinShadow}`} style={{
-      left: "40px",
+      left: "50%",
       top: "825px",
+      marginRight: "-50%",
+      transform: "translate(-50%)",
       maxWidth: "660px",
       fontSize: "15px",
       letterSpacing: `${abilityNote.length > 40 ? 0 : 1}px`,
