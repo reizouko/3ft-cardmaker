@@ -1,27 +1,22 @@
 {
   "name": "cardmaker",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
   "dependencies": {
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.62",
-    "@types/qrcode.react": "^1.0.1",
+    "@emotion/react": "^11.10.0",
+    "@emotion/styled": "^11.10.0",
+    "@mui/icons-material": "^5.10.2",
+    "@mui/material": "^5.10.2",
+    "@types/html2canvas": "^1.0.0",
+    "@types/qrcode.react": "^1.0.2",
     "@types/react": "^16.9.49",
-    "@types/react-dom": "^16.9.8",
-    "@types/react-router-dom": "^5.1.5",
-    "html2canvas": "^1.0.0-rc.7",
-    "qrcode.react": "^1.0.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-rnd": "^10.2.3",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.3",
-    "typescript": "^3.7.5"
+    "@types/react-dom": "^18.0.6",
+    "html2canvas": "^1.4.1",
+    "qrcode.react": "^3.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-rnd": "^10.3.7",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.8.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -43,5 +38,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "prettier": "^2.7.1"
   }
 }
